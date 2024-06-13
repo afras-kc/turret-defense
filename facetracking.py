@@ -13,15 +13,22 @@ if not cap.isOpened():
     exit()
 
 
-port = "/dev/tty.usbmodem101"
+port = "/dev/tty.usbmodem1101"
 board = pyfirmata.Arduino(port)
-servo_pinX = board.get_pin('d:9:s') #pin 9 Arduino
-servo_pinY = board.get_pin('d:10:s') #pin 10 Arduino
+servo_pinY = board.get_pin('d:9:s') #pin 9 Arduino
+servo_pinX = board.get_pin('d:10:s') #pin 10 Arduino
+servo_pinLaser = board.get_pin('d:11:s') #pin 10 Arduino
 
 detector = FaceDetector()
-servoPos = [90, 90] # initial servo position
+servoPos = [90, 90] # initial servo positionz
+servo_pinX.write(180 - servoPos[0])
+servo_pinY.write(servoPos[1])
 
 while True:
+    # turn laser on
+    servo_pinLaser.write(1)
+    
+    
     success, img = cap.read()
     img, bboxs = detector.findFaces(img, draw=False)
 
@@ -64,9 +71,9 @@ while True:
     cv2.putText(img, f'Servo X: {int(servoPos[0])} deg', (50, 50), cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 0), 2)
     cv2.putText(img, f'Servo Y: {int(servoPos[1])} deg', (50, 100), cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 0), 2)
 
-    print(f"Servo X: {int(servoPos[0])} deg")
-    print(f"Servo Y: {int(servoPos[1])} deg")
-    servo_pinX.write(servoPos[0])
+    #print(f"Servo X: {int(servoPos[0])} deg")
+    #print(f"Servo Y: {int(servoPos[1])} deg")
+    servo_pinX.write(180 - servoPos[0])
     servo_pinY.write(servoPos[1])
 
     cv2.imshow("Image", img)
